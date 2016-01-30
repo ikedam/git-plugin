@@ -13,6 +13,7 @@ import org.jenkinsci.plugins.gitclient.CloneCommand;
 import org.jenkinsci.plugins.gitclient.FetchCommand;
 import org.jenkinsci.plugins.gitclient.GitClient;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import java.io.IOException;
 
@@ -24,6 +25,7 @@ public class CloneOption extends GitSCMExtension {
     private final boolean noTags;
     private final String reference;
     private final Integer timeout;
+    private Integer depth; // almost final
 
     public CloneOption(boolean shallow, String reference, Integer timeout) {
         this(shallow, false, reference, timeout);
@@ -53,12 +55,31 @@ public class CloneOption extends GitSCMExtension {
         return timeout;
     }
 
+    /**
+     * @param depth the depth for shallow clone
+     */
+    @DataBoundSetter
+    public void setDepth(Integer depth) {
+        this.depth = depth;
+    }
+
+    /**
+     * @return the depth for shallow clone
+     */
+    public Integer getDepth() {
+        return depth;
+    }
+
     @Override
     public void decorateCloneCommand(GitSCM scm, Run<?, ?> build, GitClient git, TaskListener listener, CloneCommand cmd) throws IOException, InterruptedException, GitException {
         if (shallow) {
             listener.getLogger().println("Using shallow clone");
+            if (depth != null) {
+                listener.getLogger().format("  with depth {0}", depth);
+            }
             cmd.shallow();
-        }
+            cmd.depth(depth);
+       }
         if (noTags) {
             listener.getLogger().println("Avoid fetching tags");
             cmd.tags(false);

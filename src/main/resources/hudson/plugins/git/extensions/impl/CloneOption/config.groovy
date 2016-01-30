@@ -2,8 +2,10 @@ package hudson.plugins.git.extensions.impl.CloneOption;
 
 def f = namespace(lib.FormTagLib);
 
-f.entry(title:_("Shallow clone"), field:"shallow") {
-    f.checkbox()
+f.optionalBlock(title:_("Shallow clone"), field:"shallow", inline: true) {
+    f.entry(title:_("Shallow depth"), field:"depth") {
+        f.textbox()
+    }
 }
 f.entry(title:_("Do not fetch tags"), field:"noTags") {
 	f.checkbox()
